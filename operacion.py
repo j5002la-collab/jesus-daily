@@ -105,7 +105,15 @@ def cmd_daily():
         log("   ❌ Error ejecutando fb_publisher.py")
         state["total_errors"] += 1
 
-    # 2. Update state
+    # 2. Trackear métricas
+    log("📊 Recolectando métricas...")
+    track_result = run_script("tracker.py")
+    if track_result and track_result["success"]:
+        log("   ✅ Métricas actualizadas")
+    else:
+        log("   ⚠️ Tracker: sin datos de insights", "WARN")
+
+    # 3. Update state
     state["days_running"] += 1
     state["last_daily"] = datetime.now().isoformat()
     save_json(STATE_FILE, state)
