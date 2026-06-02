@@ -215,9 +215,13 @@ def publish_post(day=None):
     print(f"   Imagen: {image_file.name} {'✅' if image_file.exists() else '❌'}")
 
     # Publicar con imagen si existe
+    result = None
     if image_file.exists() and image_file.stat().st_size > 0:
         result = publish_photo(page_id, token, str(image_file), caption)
-    else:
+        if 'id' not in result:
+            print(f"   ⚠️ Imagen falló, intentando texto...")
+    
+    if not result or 'id' not in result:
         # Text-only fallback
         url = f"https://graph.facebook.com/v19.0/{page_id}/feed"
         data = f"message={urllib.parse.quote(caption)}&access_token={token}".encode()
