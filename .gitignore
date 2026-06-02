@@ -32,3 +32,5 @@ __pycache__/
 
 # Productos digitales generados
 productos/*.pdf
+page_token.txt
+page_id.txt
