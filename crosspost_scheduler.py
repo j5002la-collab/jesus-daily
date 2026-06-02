@@ -20,7 +20,7 @@ DATA_DIR = BASE_DIR / "crosspost_data"
 DOWNLOADS = DATA_DIR / "downloads"
 STATE_FILE = DATA_DIR / "crosspost_state.json"
 LOG_FILE = BASE_DIR / "crosspost.log"
-COOKIES_FILE = Path(os.path.expanduser("~")) / "youtube_cookies.txt"
+COOKIES_FILE = Path("/opt/data/youtube_cookies.txt")
 
 YT_DLP = "/opt/data/yt-dlp"
 CHANNEL_URL = "https://www.youtube.com/@JesusDailyShorts1/shorts"

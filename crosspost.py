@@ -65,7 +65,7 @@ def load_env():
 
 
 YT_DLP = "/opt/data/yt-dlp"
-COOKIES_FILE = str(Path(os.path.expanduser("~")) / "youtube_cookies.txt")
+COOKIES_FILE = "/opt/data/youtube_cookies.txt"
 
 def get_latest_shorts(limit=5):
     """Obtiene los últimos shorts del canal usando yt-dlp."""
