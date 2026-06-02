@@ -164,7 +164,7 @@ def publish_post(day=None):
         with open(state_path) as f:
             state = json.load(f)
     else:
-        state = {}
+        state = {"current_day": 0, "total_published": 0, "last_published": None, "cycles_completed": 0}
 
     current = state.get("current_day", 0)
     cycle = state.get("cycles_completed", 0)
