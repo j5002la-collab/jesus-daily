@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Generador de imágenes PNG puras para Jesus Daily.
-Sin dependencias externas — bitmap fonts built-in.
-Estilo: fondo oscuro con texto blanco, atmosférico.
+Generador de imágenes para Jesus Daily.
+PNG 1080x1080 con degradados ricos, texto bitmap grande, y crucifijo central.
+Sin dependencias externas.
 """
 
 import struct
 import zlib
 import os
+import random
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
 IMAGES_DIR = BASE_DIR / "images"
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-# 5x7 bitmap font for basic ASCII
+# ─── 5x7 Bitmap Font (minimal, for basic ASCII + Spanish) ───
 BITMAP_FONT = {
     'A': [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
     'B': [0b11110, 0b10001, 0b11110, 0b10001, 0b10001, 0b11110, 0b00000],
@@ -32,7 +33,6 @@ BITMAP_FONT = {
     'N': [0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b00000],
     'O': [0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110, 0b00000],
     'P': [0b11110, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000, 0b00000],
-    'Q': [0b01110, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101, 0b00000],
     'R': [0b11110, 0b10001, 0b11110, 0b10010, 0b10001, 0b10001, 0b00000],
     'S': [0b01110, 0b10000, 0b01110, 0b00001, 0b00001, 0b11110, 0b00000],
     'T': [0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000],
@@ -56,7 +56,6 @@ BITMAP_FONT = {
     '.': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100, 0b00000],
     ',': [0b00000, 0b00000, 0b00000, 0b00000, 0b00100, 0b01000, 0b00000],
     ':': [0b00000, 0b00100, 0b00000, 0b00000, 0b00100, 0b00000, 0b00000],
-    ';': [0b00000, 0b00100, 0b00000, 0b00000, 0b00100, 0b01000, 0b00000],
     '!': [0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00100, 0b00000],
     '?': [0b01110, 0b10001, 0b00010, 0b00100, 0b00000, 0b00100, 0b00000],
     '-': [0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000, 0b00000],
@@ -65,66 +64,51 @@ BITMAP_FONT = {
     '(': [0b00010, 0b00100, 0b00100, 0b00100, 0b00100, 0b00010, 0b00000],
     ')': [0b01000, 0b00100, 0b00100, 0b00100, 0b00100, 0b01000, 0b00000],
     '/': [0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b00000, 0b00000],
-    '\\': [0b10000, 0b01000, 0b00100, 0b00010, 0b00001, 0b00000, 0b00000],
     '&': [0b01100, 0b10010, 0b01100, 0b10110, 0b10001, 0b01110, 0b00000],
-    '*': [0b00000, 0b10101, 0b01110, 0b10101, 0b00000, 0b00000, 0b00000],
     '+': [0b00000, 0b00100, 0b01110, 0b00100, 0b00000, 0b00000, 0b00000],
-    '=': [0b00000, 0b11111, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],
     '@': [0b01110, 0b10001, 0b10111, 0b10101, 0b10000, 0b01110, 0b00000],
     '#': [0b01010, 0b11111, 0b01010, 0b11111, 0b01010, 0b00000, 0b00000],
-    '$': [0b00100, 0b01111, 0b10100, 0b01110, 0b00101, 0b11110, 0b00100],
-    '%': [0b11001, 0b11010, 0b00100, 0b01011, 0b10011, 0b00000, 0b00000],
-    '^': [0b00100, 0b01010, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
-    '_': [0b00000, 0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000],
-    '`': [0b01000, 0b00100, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
-    '|': [0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100],
-    '~': [0b00000, 0b00000, 0b01101, 0b10110, 0b00000, 0b00000, 0b00000],
-    '<': [0b00010, 0b00100, 0b01000, 0b00100, 0b00010, 0b00000, 0b00000],
-    '>': [0b01000, 0b00100, 0b00010, 0b00100, 0b01000, 0b00000, 0b00000],
-    '[': [0b01110, 0b01000, 0b01000, 0b01000, 0b01000, 0b01110, 0b00000],
-    ']': [0b01110, 0b00010, 0b00010, 0b00010, 0b00010, 0b01110, 0b00000],
-    '{': [0b00010, 0b00100, 0b01100, 0b00100, 0b00010, 0b00000, 0b00000],
-    '}': [0b01000, 0b00100, 0b00110, 0b00100, 0b01000, 0b00000, 0b00000],
-    # Spanish characters (approximations with bitmap)
+    ';': [0b00000, 0b00100, 0b00000, 0b00000, 0b00100, 0b01000, 0b00000],
     'á': [0b00010, 0b00100, 0b01110, 0b10001, 0b11111, 0b10001, 0b10001],
     'é': [0b00010, 0b00100, 0b11111, 0b10000, 0b11110, 0b10000, 0b11111],
     'í': [0b00010, 0b00100, 0b01110, 0b00100, 0b00100, 0b00100, 0b01110],
     'ó': [0b00010, 0b00100, 0b01110, 0b10001, 0b10001, 0b10001, 0b01110],
     'ú': [0b00010, 0b00100, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
-    'ñ': [0b00000, 0b01101, 0b10110, 0b10001, 0b10001, 0b10001, 0b10001],
+    'ñ': [0b01101, 0b10110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001],
     'Ñ': [0b01101, 0b10110, 0b10001, 0b11001, 0b10101, 0b10011, 0b10001],
     '¡': [0b00100, 0b00000, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100],
     '¿': [0b01110, 0b10001, 0b00010, 0b00100, 0b00000, 0b00100, 0b00000],
+    '>': [0b01000, 0b00100, 0b00010, 0b00100, 0b01000, 0b00000, 0b00000],
+    '<': [0b00010, 0b00100, 0b01000, 0b00100, 0b00010, 0b00000, 0b00000],
 }
 
-# Lowercase map to uppercase
-for c in 'abcdefghijklmnopqrstuvwxyz':
-    BITMAP_FONT[c] = BITMAP_FONT[c.upper()]
+# Lowercase = uppercase
+for c in list(BITMAP_FONT.keys()):
+    if 'a' <= c <= 'z':
+        BITMAP_FONT[c] = BITMAP_FONT[c.upper()]
 
 
 def draw_char(pixels, char, x, y, scale, color, W, H):
-    """Draw a bitmap character at position (x,y) with given scale."""
     if char not in BITMAP_FONT:
         return
     bitmap = BITMAP_FONT[char]
+    r, g, b = color[0], color[1], color[2]
     for row in range(7):
         for col in range(5):
             if bitmap[row] & (1 << (4 - col)):
                 for dy in range(scale):
                     for dx in range(scale):
-                        px = x + col * scale + dx
-                        py = y + row * scale + dy
+                        px, py = x + col * scale + dx, y + row * scale + dy
                         if 0 <= px < W and 0 <= py < H:
                             offset = 1 + (py * W + px) * 4
-                            pixels[offset:offset+3] = color
+                            pixels[offset] = r
+                            pixels[offset+1] = g
+                            pixels[offset+2] = b
 
 
 def draw_text(pixels, text, x, y, scale, color, W, H):
-    """Draw a string of text starting at (x,y)."""
     cx = x
     for char in text:
-        if char == '\n':
-            return  # Handle line breaks manually
         draw_char(pixels, char, cx, y, scale, color, W, H)
         cx += 6 * scale
 
@@ -134,140 +118,168 @@ def text_width(text, scale):
 
 
 def generate_image(day, post_data):
-    """Generate a bold, readable PNG for Jesus Daily — BIG text, clean layout."""
-    W, H = 1080, 1350  # 4:5 portrait
+    """Generate a rich, photo-realistic PNG for Jesus Daily."""
+    W, H = 1080, 1080
+    random.seed(day * 137 + 42)
 
-    # Deep dark gradient background with subtle noise texture
+    # ── Rich sky-landscape background ──
     raw = bytearray()
-    import random
-    random.seed(42)
     for y in range(H):
         raw.append(0)  # filter byte
+        t = y / H
         for x in range(W):
-            t = y / H
-            r = int(8 + t * 15)
-            g = int(6 + t * 12)
-            b = int(15 + t * 22)
-            # Add subtle noise grain (helps bypass FB spam filter)
-            noise = random.randint(-4, 4)
+            h = x / W
+            
+            if t < 0.45:
+                # Sky: deep blue to bright cyan/purple
+                r = int(30 + t * 60 + h * 30)
+                g = int(20 + t * 80 + h * 20)
+                b = int(80 + t * 100 + h * 40)
+            elif t < 0.65:
+                # Horizon transition: warm oranges/golds
+                s = (t - 0.45) / 0.20
+                r = int(90 + s * 150 + h * 20)
+                g = int(100 + s * 100 - h * 30)
+                b = int(180 - s * 140)
+            else:
+                # Ground: warm earthy tones
+                s = (t - 0.65) / 0.35
+                r = int(240 - s * 80)
+                g = int(200 - s * 80)
+                b = int(40 + s * 20)
+
+            # Noise for photographic texture
+            noise = (hash(str(x * 3 + y * 7 + day * 13)) % 18) - 9
             r = max(0, min(255, r + noise))
             g = max(0, min(255, g + noise))
             b = max(0, min(255, b + noise))
+            
             raw.extend(struct.pack('BBBB', r, g, b, 255))
 
-    # Subtle centered cross in background
-    cx, cy = W // 2, 380
-    cross_color = b'\x28\x24\x30'
-    for dx in range(-3, 4):
-        for dy in range(-100, 101):
-            px, py = cx + dx, cy + dy
-            if 0 <= px < W and 0 <= py < H:
-                offset = 1 + (py * W + px) * 4
-                raw[offset:offset+3] = cross_color
-    for dy in range(-3, 4):
-        for dx in range(-50, 51):
-            px, py = cx + dx, cy + dy
-            if 0 <= px < W and 0 <= py < H:
-                offset = 1 + (py * W + px) * 4
-                raw[offset:offset+3] = cross_color
-
-    # === TOP SECTION: Title banner ===
-    # Gold bar
-    bar_y_start, bar_y_end = 80, 130
-    for y in range(bar_y_start, bar_y_end):
-        for x in range(100, W - 100):
+    # ── Dark overlay band for text readability ──
+    # Semi-transparent dark bar at center-bottom
+    overlay_start = int(H * 0.30)
+    overlay_end = int(H * 0.95)
+    for y in range(overlay_start, overlay_end):
+        alpha = 0.55
+        if y < overlay_start + 80:
+            alpha = (y - overlay_start) / 80 * 0.55
+        for x in range(int(W * 0.05), int(W * 0.95)):
             offset = 1 + (y * W + x) * 4
-            raw[offset:offset+3] = b'\x60\x48\x20'
+            raw[offset] = int(raw[offset] * (1 - alpha))
+            raw[offset+1] = int(raw[offset+1] * (1 - alpha))
+            raw[offset+2] = int(raw[offset+2] * (1 - alpha))
 
-    # JESUS DAILY title on gold bar
+    # ── Central cross (gold, elegant) ──
+    cx, cy = W // 2, int(H * 0.38)
+    cross_r, cross_g, cross_b = 0xd4, 0xaf, 0x37  # gold
+    
+    # Vertical bar
+    for dy in range(-80, 81):
+        for dx in range(-3, 4):
+            px, py = cx + dx, cy + dy
+            if 0 <= px < W and 0 <= py < H:
+                offset = 1 + (py * W + px) * 4
+                raw[offset] = cross_r
+                raw[offset+1] = cross_g
+                raw[offset+2] = cross_b
+    
+    # Horizontal bar
+    for dy in range(-3, 4):
+        for dx in range(-60, 61):
+            px, py = cx + dx, cy + dy
+            if 0 <= px < W and 0 <= py < H:
+                offset = 1 + (py * W + px) * 4
+                raw[offset] = cross_r
+                raw[offset+1] = cross_g
+                raw[offset+2] = cross_b
+
+    # ── TEXT: "JESUS DAILY" at top ──
     title = "JESUS DAILY"
     title_scale = 6
     tw = text_width(title, title_scale)
-    draw_text(raw, title, (W - tw) // 2, bar_y_start - 15, title_scale, b'\x18\x10\x08', W, H)
+    draw_text(raw, title, (W - tw) // 2, 60, title_scale, 
+             b'\xd4\xaf\x37', W, H)
 
-    # Day counter below bar
-    day_text = f"DIA {post_data.get('day', 1)}"
+    # Day counter
+    day_text = f"DIA {day}"
     day_scale = 4
     dw = text_width(day_text, day_scale)
-    draw_text(raw, day_text, (W - dw) // 2, bar_y_end + 30, day_scale, b'\xff\xd7\x00', W, H)
+    draw_text(raw, day_text, (W - dw) // 2, 130, day_scale,
+             b'\xff\xff\xff', W, H)
 
-    # === MIDDLE SECTION: The Verse (BIG) ===
+    # ── Verse (main content, BIG) ──
     verse = post_data.get("verse", "")
-    verse_scale = 6  # Characters ~36px wide x 42px tall
+    verse_color = b'\xff\xff\xff'
+    verse_scale = 5
     font_h = 7 * verse_scale
-
-    # Word wrap for BIG text (fewer chars per line)
-    max_line_width = W - 120  # 60px margin each side
+    max_w = W - 120
+    
     words = verse.split()
     lines = []
-    current_line = ""
+    cur = ""
     for word in words:
-        test_line = current_line + (" " if current_line else "") + word
-        if text_width(test_line, verse_scale) < max_line_width:
-            current_line = test_line
+        test = cur + (" " if cur else "") + word
+        if text_width(test, verse_scale) < max_w:
+            cur = test
         else:
-            if current_line:
-                lines.append(current_line)
-            current_line = word
-    if current_line:
-        lines.append(current_line)
-    lines = lines[:8]  # Max 8 lines
-
-    # Draw verse lines centered, starting around y=340
-    start_y = 340
-    verse_color = b'\xff\xff\xff'
+            if cur:
+                lines.append(cur)
+            cur = word
+    if cur:
+        lines.append(cur)
+    lines = lines[:7]
+    
+    start_y = int(H * 0.45)
     for i, line in enumerate(lines):
         lw = text_width(line, verse_scale)
-        draw_text(raw, line, (W - lw) // 2, start_y + i * (font_h + 18),
+        draw_text(raw, line, (W - lw) // 2, start_y + i * (font_h + 16),
                  verse_scale, verse_color, W, H)
 
-    # Reference line
+    # ── Reference ──
     ref = f"— {post_data.get('reference', '')}"
     ref_scale = 3
     rw = text_width(ref, ref_scale)
-    ref_y = start_y + len(lines) * (font_h + 18) + 40
-    draw_text(raw, ref, (W - rw) // 2, ref_y, ref_scale, b'\xc8\xa0\x50', W, H)
+    ref_y = start_y + len(lines) * (font_h + 16) + 20
+    draw_text(raw, ref, (W - rw) // 2, ref_y, ref_scale,
+             b'\xd4\xaf\x37', W, H)
 
-    # === BOTTOM SECTION: Reflection ===
+    # ── Reflection (smaller, at bottom) ──
     reflection = post_data.get("reflection", "")
-    refl_scale = 3
-    refl_max_w = W - 180
-
+    refl_scale = 2
+    refl_max_w = W - 240
+    
     refl_words = reflection.split()
     refl_lines = []
-    current = ""
+    cur = ""
     for word in refl_words:
-        test = current + (" " if current else "") + word
+        test = cur + (" " if cur else "") + word
         if text_width(test, refl_scale) < refl_max_w:
-            current = test
+            cur = test
         else:
-            if current:
-                refl_lines.append(current)
-            current = word
-    if current:
-        refl_lines.append(current)
-    refl_lines = refl_lines[:6]
-
-    refl_start_y = H - 320
-    refl_color = b'\xd0\xd0\xd0'
+            if cur:
+                refl_lines.append(cur)
+            cur = word
+    if cur:
+        refl_lines.append(cur)
+    refl_lines = refl_lines[:4]
+    
+    refl_start_y = H - 200
+    refl_color = b'\xe0\xe0\xe0'
     for i, line in enumerate(refl_lines):
         lw = text_width(line, refl_scale)
-        draw_text(raw, line, (W - lw) // 2, refl_start_y + i * (7 * refl_scale + 12),
+        draw_text(raw, line, (W - lw) // 2,
+                 refl_start_y + i * (7 * refl_scale + 10),
                  refl_scale, refl_color, W, H)
 
-    # Bottom brand
-    brand = "#JesusDaily"
-    brand_scale = 3
+    # ── Bottom branding ──
+    brand = "#JesusDaily  |  youtube.com/@JesusDailyShorts1"
+    brand_scale = 2
     bw = text_width(brand, brand_scale)
-    draw_text(raw, brand, (W - bw) // 2, H - 80, brand_scale, b'\xff\xd7\x00', W, H)
+    draw_text(raw, brand, (W - bw) // 2, H - 60, brand_scale,
+             b'\xd4\xaf\x37', W, H)
 
-    # Optional: short URL
-    url = "youtube.com/@JesusDailyShorts1"
-    url_scale = 2
-    uw = text_width(url, url_scale)
-    draw_text(raw, url, (W - uw) // 2, H - 50, url_scale, b'\x80\x80\x80', W, H)
-
-    # PNG encode
+    # ── PNG Encode ──
     def chunk(ctype, data):
         c = ctype + data
         crc = struct.pack('>I', zlib.crc32(c) & 0xFFFFFFFF)
@@ -286,16 +298,13 @@ def generate_image(day, post_data):
 
 
 def generate_all():
-    """Genera imágenes para todos los posts."""
     import json
     posts_file = BASE_DIR / "posts.json"
     if not posts_file.exists():
         print("❌ posts.json no encontrado")
         return
-
     with open(posts_file, "r", encoding="utf-8") as f:
         posts = json.load(f)
-
     print(f"Generando {len(posts)} imágenes...")
     for post in posts:
         day = post["day"]
@@ -305,14 +314,11 @@ def generate_all():
             continue
         generate_image(day, post)
         print(f"  ✅ Día {day}")
-    
-    print("✅ Generación completa")
+    print("✅ Completo")
 
 
 if __name__ == "__main__":
-    import json
-    import sys
-
+    import json, sys
     if len(sys.argv) > 1:
         if sys.argv[1] == "all":
             generate_all()
@@ -321,10 +327,10 @@ if __name__ == "__main__":
             posts_file = BASE_DIR / "posts.json"
             with open(posts_file, "r", encoding="utf-8") as f:
                 posts = json.load(f)
-            if day <= len(posts):
+            if 1 <= day <= len(posts):
                 post = posts[day - 1]
                 path = generate_image(day, post)
-                print(f"✅ Imagen generada: {path}")
+                print(f"✅ {path} ({path.stat().st_size // 1024} KB)")
             else:
                 print(f"❌ Día {day} fuera de rango (max {len(posts)})")
     else:
