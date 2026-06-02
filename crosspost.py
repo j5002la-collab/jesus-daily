@@ -64,11 +64,13 @@ def load_env():
     return env
 
 
+YT_DLP = "/opt/data/yt-dlp"
+
 def get_latest_shorts(limit=5):
     """Obtiene los últimos shorts del canal usando yt-dlp."""
     try:
         result = subprocess.run(
-            ["yt-dlp", "--flat-playlist", "--dump-json", 
+            [YT_DLP, "--flat-playlist", "--dump-json", 
              CHANNEL_URL, "--playlist-end", str(limit)],
             capture_output=True, text=True, timeout=30
         )
@@ -106,7 +108,7 @@ def download_short(video_id):
 
     try:
         result = subprocess.run(
-            ["yt-dlp", "-f", "best[height<=1080]", "-o", output_template, url],
+            [YT_DLP, "-f", "best[height<=1080]", "-o", output_template, url],
             capture_output=True, text=True, timeout=120
         )
         if result.returncode != 0:
