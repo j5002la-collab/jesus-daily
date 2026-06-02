@@ -65,13 +65,15 @@ def load_env():
 
 
 YT_DLP = "/opt/data/yt-dlp"
+COOKIES_FILE = str(Path(os.path.expanduser("~")) / "youtube_cookies.txt")
 
 def get_latest_shorts(limit=5):
     """Obtiene los últimos shorts del canal usando yt-dlp."""
     try:
         result = subprocess.run(
             [YT_DLP, "--flat-playlist", "--dump-json", 
-             CHANNEL_URL, "--playlist-end", str(limit)],
+             CHANNEL_URL, "--playlist-end", str(limit),
+             "--cookies", COOKIES_FILE],
             capture_output=True, text=True, timeout=30
         )
         if result.returncode != 0:
@@ -108,7 +110,8 @@ def download_short(video_id):
 
     try:
         result = subprocess.run(
-            [YT_DLP, "-f", "best[height<=1080]", "-o", output_template, url],
+            [YT_DLP, "-f", "best[height<=1080]", "-o", output_template, url,
+            "--cookies", COOKIES_FILE],
             capture_output=True, text=True, timeout=120
         )
         if result.returncode != 0:
