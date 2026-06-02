@@ -1,0 +1,30 @@
+# Credenciales - NUNCA SUBIR
+.env
+
+# Progreso de publicación (autogenerado)
+state.json
+estado_operacion.json
+
+# Logs
+publish.log
+tracker.log
+logs/
+
+# Revenue
+revenue.json
+
+# Imágenes generadas
+images/
+
+# Output
+output/
+
+# Reportes
+reportes/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Productos digitales generados
+productos/*.pdf
