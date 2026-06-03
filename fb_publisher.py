@@ -94,7 +94,7 @@ def generate_image(post, output_path):
             capture_output=True, text=True, timeout=30,
             cwd=str(BASE_DIR)
         )
-        return output_path.exists()
+        return Path(output_path).exists()
     
     # Fallback: generate simple PNG
     try:
