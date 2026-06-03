@@ -20,20 +20,8 @@ YT_DLP = "/opt/data/yt-dlp"
 COOKIES = "/opt/data/youtube_cookies.txt"
 CHANNEL = "https://www.youtube.com/@JesusDailyShorts1/shorts"
 
-HOOKS = [
-    "🔥 Esto cambió mi vida hoy...",
-    "😭 No pude contener las lágrimas...",
-    "💔 Si necesitas una señal, esto es para ti...",
-    "🙏 Dios me habló con este versículo...",
-    "⚠️ El 99% ignora esto...",
-]
-CTAs = [
-    "❤️ Dale LIKE si Dios te habló",
-    "💬 Comenta AMÉN si crees",
-    "↗️ COMPARTE esta palabra",
-    "👇 Etiqueta a quien necesite esto",
-    "🔥 Síguenos @globaljesus.daily",
-]
+HOOKS = []  # Sin hooks virales — formato limpio estilo Mensanity
+CTAs = []    # Sin CTAs
 
 def load_env():
     env = {}
@@ -130,10 +118,12 @@ def cmd_crosspost_fb():
         print("✅ Última imagen ya crossposteada a IG")
         return True
     
-    # Build viral caption
-    hook = random.choice(HOOKS)
-    cta = random.choice(CTAs)
-    caption = f"{hook}\n\n{fb_msg[:100]}\n\n{cta}\n\n#JesusDaily #Fe #Biblia #DiosEsAmor #CristoVive"
+    # Build caption — formato limpio estilo Mensanity
+    # FB caption ya tiene el formato correcto, lo usamos tal cual
+    caption = fb_msg if fb_msg else "Palabra de Dios para ti hoy.\n\n#JesusDaily #CristoEsRey ✝️"
+    # Aseguramos hashtags de marca
+    if "#GlobalJesus" not in caption:
+        caption += "\n#GlobalJesus #CristoEsRey ✝️"
     
     print(f"📸 Crossposteando FB → IG: {fb_msg[:60]}...")
     result = ig_publish_image(img_url, caption, ig_id, token)
