@@ -31,56 +31,13 @@ def load_env():
 
 
 def format_caption(post):
-    """Caption viral optimizado — hook + cta + hashtags trending."""
-    # Inline viral optimization (avoids import issues with Hermes)
-    HOOKS = [
-        "🔥 Esto cambió mi vida hoy...",
-        "😭 Leí esto y no pude contener las lágrimas...",
-        "💔 Si estás pasando por algo difícil, esto es para ti...",
-        "🙏 Dios me habló con este versículo hoy...",
-        "⚠️ El 99% de cristianos ignora este versículo...",
-        "🤔 ¿Crees que esto es casualidad?",
-        "📖 El versículo más poderoso que casi nadie lee...",
-        "🕊️ Esto es lo que Dios quiere decirte HOY...",
-        "🔥 Esta palabra es para ti. Sí, para TI.",
-        "⏰ 30 segundos que pueden cambiar tu día...",
-    ]
-    CTAs = [
-        "❤️ Dale LIKE si Dios te habló hoy",
-        "💬 Comenta tu versículo favorito abajo",
-        "↗️ COMPARTE esta palabra — podrías cambiar el día de alguien",
-        "🙏 Escribe AMÉN si crees en los milagros",
-        "👇 Etiqueta a un amigo que necesite escuchar esto",
-        "🔥 Síguenos para recibir la palabra de Dios cada día",
-        "📲 Guarda este post para volver a leerlo cuando lo necesites",
-    ]
-    import random, datetime
-    hook = random.choice(HOOKS)
-    cta = random.choice(CTAs)
-    day = datetime.datetime.now().weekday()
-    month = datetime.datetime.now().month
-    
-    # Trending hashtags rotativos
-    broad = random.choice([
-        "#Viral #FYP #Parati #Trending #ReelsFacebook",
-        "#Viral #Reels #ParaTi #Tendencia #DiosEsAmor",
-        "#FYPシ #Viral2026 #Dios #CristoVive #Trending",
-    ])
-    niche = random.choice([
-        "#JesusDaily #FeCristiana #Biblia #Oracion",
-        "#PalabraDeDios #Devocional #CristoRey #Fe",
-        "#Fe #Esperanza #AmorDeDios #OracionDiaria",
-    ])
-    hashtags = f"{broad} {niche}"
-    
+    """Formato estilo Mensanity: limpio, directo, sin hooks virales ni CTAs."""
     return (
-        f"{hook}\n\n"
         f"\"{post['verse']}\"\n"
         f"— {post['reference']}\n\n"
         f"{post['reflection']}\n\n"
-        f"{cta}\n\n"
-        f"{hashtags}\n"
-        f"#JesusDaily #CristoEsRey ✝️"
+        f"{post['hashtags']}\n"
+        f"#GlobalJesus #CristoEsRey ✝️"
     )
 
 
